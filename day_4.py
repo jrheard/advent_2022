@@ -1024,7 +1024,12 @@ def part_one() -> int:
 
 
 def part_two() -> int:
-    return -1
+    result = 0
+    for left, right in parse_input():
+        if set(left) & set(right):
+            result += 1
+
+    return result
 
 
 if __name__ == "__main__":
