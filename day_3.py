@@ -1,4 +1,12 @@
 import string
+from itertools import islice
+
+
+# via https://stackoverflow.com/questions/312443/how-do-i-split-a-list-into-equally-sized-chunks
+def chunk(it, size: int):
+    it = iter(it)
+    return list(iter(lambda: tuple(islice(it, size)), ()))
+
 
 PUZZLE_INPUT = """ZNNvFWHqLNPZHHqPTHHnTGBhrrpjvmwfMmpfpjBjwpmw
 sbdzQgzgssgbglRtmjlwhjBlfrSrMt
@@ -302,36 +310,44 @@ lZqjHlVRvRltLtRWFMtFLL
 qvjWzzvVbZpjqllggscdchwDrCphwsdhrD"""
 
 
-def parse_input() -> list[tuple[str, str]]:
-    def parse_line(line: str) -> tuple[str, str]:
-        midpoint = len(line) // 2
-        return line[:midpoint], line[midpoint:]
-
-    return [parse_line(line) for line in PUZZLE_INPUT.split("\n")]
+def parse_input() -> list[str]:
+    return PUZZLE_INPUT.split("\n")
 
 
-def find_duplicates(rucksack: tuple[str, str]) -> set[str]:
-    return set(rucksack[0]) & set(rucksack[1])
+def find_duplicates_within_one_rucksack(rucksack: str) -> set[str]:
+    midpoint = len(rucksack) // 2
+    left, right = rucksack[:midpoint], rucksack[midpoint:]
+    return set(left) & set(right)
+
+
+def score_char(char: str) -> int:
+    if char in string.ascii_lowercase:
+        return ord(char) - 96
+    else:
+        return ord(char) - 64 + 26
 
 
 def score_duplicates(duplicates: set[str]) -> int:
-    def score_char(char: str) -> int:
-        if char in string.ascii_lowercase:
-            return ord(char) - 96
-        else:
-            return ord(char) - 64 + 26
-
     return sum(score_char(char) for char in duplicates)
 
 
 def part_one() -> int:
     rucksacks = parse_input()
 
-    return sum(score_duplicates(find_duplicates(rucksack)) for rucksack in rucksacks)
+    return sum(
+        score_duplicates(find_duplicates_within_one_rucksack(rucksack))
+        for rucksack in rucksacks
+    )
 
 
 def part_two() -> int:
-    return -1
+    rucksacks = parse_input()
+    grouped_rucksacks = chunk(rucksacks, 3)
+    badges_per_group = [
+        next(iter(set(r1) & set(r2) & set(r3))) for r1, r2, r3 in grouped_rucksacks
+    ]
+
+    return sum(map(score_char, badges_per_group))
 
 
 if __name__ == "__main__":
