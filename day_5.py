@@ -563,8 +563,17 @@ def part_one() -> str:
     return "".join(stack.pop() for stack in stacks)
 
 
-def part_two() -> int:
-    return -1
+def part_two() -> str:
+    stacks, instructions = parse_input()
+
+    for instruction in instructions:
+        payload = stacks[instruction.source_index][-instruction.quantity :]
+        for _ in range(instruction.quantity):
+            stacks[instruction.source_index].pop()
+
+        stacks[instruction.destination_index].extend(payload)
+
+    return "".join(stack.pop() if stack else "" for stack in stacks)
 
 
 if __name__ == "__main__":
