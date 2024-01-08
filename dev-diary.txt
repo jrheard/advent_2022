@@ -1,0 +1,7 @@
+i have an interview in a few days and have to write python for the coding exercise
+i've been learning typescript lately so i want to refresh my python muscle memory
+starting up another aoc year to focus on python
+
+for at least the first day, i'm gonna do my work in coderpad and copy-paste it over when i'm done
+coderpad's vim support isn't 100% so i'm gonna have to use my mouse and stuff
+ick
