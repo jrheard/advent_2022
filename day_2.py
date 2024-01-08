@@ -2503,6 +2503,14 @@ A Y"""
 
 HandShape = Enum("HandShape", ["ROCK", "PAPER", "SCISSORS"])
 
+X_DEFEATS_Y = {
+    HandShape.ROCK: HandShape.SCISSORS,
+    HandShape.PAPER: HandShape.ROCK,
+    HandShape.SCISSORS: HandShape.PAPER,
+}
+
+X_DEFEATED_BY_Y = dict((y, x) for x, y in X_DEFEATS_Y.items())
+
 
 def score_round(left_hand: HandShape, right_hand: HandShape) -> int:
     shape_score = {HandShape.ROCK: 1, HandShape.PAPER: 2, HandShape.SCISSORS: 3}[
@@ -2511,11 +2519,7 @@ def score_round(left_hand: HandShape, right_hand: HandShape) -> int:
 
     if left_hand == right_hand:
         outcome_score = 3
-    elif (
-        (left_hand == HandShape.ROCK and right_hand == HandShape.PAPER)
-        or (left_hand == HandShape.PAPER and right_hand == HandShape.SCISSORS)
-        or (left_hand == HandShape.SCISSORS and right_hand == HandShape.ROCK)
-    ):
+    elif right_hand == X_DEFEATED_BY_Y[left_hand]:
         outcome_score = 6
     else:
         outcome_score = 0
@@ -2542,5 +2546,39 @@ def part_one() -> int:
     return sum(score_round(left_hand, right_hand) for left_hand, right_hand in rounds)
 
 
+def find_losing_shape(shape: HandShape) -> HandShape:
+    match shape:
+        case HandShape.ROCK:
+            return HandShape.SCISSORS
+        case HandShape.PAPER:
+            return HandShape.ROCK
+        case HandShape.SCISSORS:
+            return HandShape.PAPER
+
+
+def part_two() -> int:
+    cheatsheet = {
+        "A": HandShape.ROCK,
+        "B": HandShape.PAPER,
+        "C": HandShape.SCISSORS,
+    }
+
+    def parse_line(line):
+        left_hand_code, outcome_code = line.split(" ")
+        left_hand = cheatsheet[left_hand_code]
+        if outcome_code == "X":
+            right_hand = X_DEFEATS_Y[left_hand]
+        elif outcome_code == "Y":
+            right_hand = left_hand
+        else:
+            right_hand = X_DEFEATED_BY_Y[left_hand]
+
+        return (left_hand, right_hand)
+
+    rounds = map(parse_line, PUZZLE_INPUT.split("\n"))
+    return sum(score_round(left_hand, right_hand) for left_hand, right_hand in rounds)
+
+
 if __name__ == "__main__":
     print(part_one())
+    print(part_two())
